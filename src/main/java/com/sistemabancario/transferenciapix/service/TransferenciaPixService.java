@@ -4,6 +4,7 @@ package com.sistemabancario.transferenciapix.service;
 import com.sistemabancario.transferenciapix.dto.TransferenciaPixRequestDTO;
 import com.sistemabancario.transferenciapix.dto.TransferenciaPixResponseDTO;
 import com.sistemabancario.transferenciapix.entity.TransferenciaPix;
+import com.sistemabancario.transferenciapix.mapper.TransferenciaPixMapper;
 import com.sistemabancario.transferenciapix.repository.TransferenciaPixRepository;
 
 // Importa as anotações e utilitários necessários
@@ -22,13 +23,17 @@ public class TransferenciaPixService {
 
     // Repositório usado para acessar o banco de dados (tabela transferencia_pix)
     private final TransferenciaPixRepository repository;
+    //mapper
+    private final TransferenciaPixMapper mapper;
 
     /**
      * Construtor que recebe o repository.
      * O Spring injeta automaticamente a dependência (injeção via construtor).
      */
-    public TransferenciaPixService(TransferenciaPixRepository repository) {
+    // ✅ Injeção via construtor (boa prática)
+    public TransferenciaPixService(TransferenciaPixRepository repository, TransferenciaPixMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     /**
@@ -55,24 +60,8 @@ public class TransferenciaPixService {
         TransferenciaPix saved = repository.save(transferencia);
 
         // 🔸 Cria e retorna o DTO de resposta (sem ID)
-        TransferenciaPixResponseDTO response = new TransferenciaPixResponseDTO();
-        response.setCodigoTransacao(saved.getCodigoTransacao());
-        response.setChaveOrigem(saved.getChaveOrigem());
-        response.setNomeOrigem(saved.getNomeOrigem());
-        response.setBancoOrigem(saved.getBancoOrigem());
-        response.setChaveDestino(saved.getChaveDestino());
-        response.setNomeDestino(saved.getNomeDestino());
-        response.setValor(saved.getValor());
-        response.setDataTransferencia(saved.getDataTransferencia());
-        response.setStatus(saved.getStatus());
-        response.setMensagem(saved.getMensagem());
-        response.setCriadoEm(saved.getCriadoEm());
-        response.setAtualizadoEm(saved.getAtualizadoEm());
-
-        return response;
-
+        return mapper.toResponseDTO(saved);
     }
-
 
     /**
      * Método para listar todas as transferências Pix do banco de dados.
