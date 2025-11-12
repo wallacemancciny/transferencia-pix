@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+/data/postgres/base/1/pg_internal.init
+/data/postgres/base/5/pg_internal.init
+/data/postgres/base/16384/16385
+/data/postgres/base/16384/16389
+/data/postgres/base/16384/16390
+/data/postgres/base/16384/16391
+/data/postgres/base/16384/16393
+/data/postgres/base/16384/16394
+/data/postgres/base/16384/16395
+/data/postgres/base/16384/16412
