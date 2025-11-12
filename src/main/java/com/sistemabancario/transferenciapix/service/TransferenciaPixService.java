@@ -9,6 +9,7 @@ import com.sistemabancario.transferenciapix.repository.TransferenciaPixRepositor
 
 // Importa as anotações e utilitários necessários
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
@@ -70,7 +71,7 @@ public class TransferenciaPixService {
     public List<TransferenciaPix> listar() {
         // 🔸 Usa o método padrão do JpaRepository (findAll)
         // Internamente, executa: SELECT * FROM transferencia_pix
-        return repository.findAll();
+        return repository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     /**
