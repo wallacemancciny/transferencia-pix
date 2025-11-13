@@ -1,8 +1,10 @@
 package com.sistemabancario.transferenciapix.controller;
 
 import com.sistemabancario.transferenciapix.dto.AuthenticationDTO;
+import com.sistemabancario.transferenciapix.dto.LoginResponseDTO;
 import com.sistemabancario.transferenciapix.dto.RegisterDTO;
 import com.sistemabancario.transferenciapix.entity.User;
+import com.sistemabancario.transferenciapix.infra.security.TokenService;
 import com.sistemabancario.transferenciapix.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("auth")
 public class AuthenticationController {
+
+    @Autowired
+    private TokenService tokenService;
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -28,7 +34,10 @@ public class AuthenticationController {
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
-        return ResponseEntity.ok().build();
+
+        var token = tokenService.generateToken((User) auth.getPrincipal());
+
+        return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
     @PostMapping("/register")
