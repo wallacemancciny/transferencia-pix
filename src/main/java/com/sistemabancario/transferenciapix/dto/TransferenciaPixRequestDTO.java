@@ -1,10 +1,14 @@
 package com.sistemabancario.transferenciapix.dto;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+
 import java.math.BigDecimal;
 
 // DTO usado para criar uma nova transferência Pix
 public class TransferenciaPixRequestDTO {
 
+    @NotBlank(message = "Chave origem não pode ficar vazio")
     private String chaveOrigem;
     private String nomeOrigem;
     private String bancoOrigem;

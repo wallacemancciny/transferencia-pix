@@ -41,11 +41,14 @@ public class TransferenciaPixService {
      * Método responsável por criar/enviar uma nova transferência Pix.
      * Aqui é onde aplicamos as regras de negócio antes de salvar no banco.
      */
-    public TransferenciaPixResponseDTO enviar(TransferenciaPix transferencia) {
+    public TransferenciaPixResponseDTO enviar(TransferenciaPixRequestDTO transferenciaPixRequestDTO) {
         // 🔸 Validação: impede que uma transferência com valor nulo ou negativo seja criada
-        if (transferencia.getValor() == null || transferencia.getValor().doubleValue() <= 0) {
+        if (transferenciaPixRequestDTO.getValor() == null || transferenciaPixRequestDTO.getValor().doubleValue() <= 0) {
             throw new IllegalArgumentException("Valor inválido para transferência Pix");
         }
+
+        // Converte DTO - Entidade
+        TransferenciaPix transferencia = mapper.toEntity(transferenciaPixRequestDTO);
 
         // 🔸 Geração do código único da transação Pix
         // Cria algo como: PIX-A1B2C3D4

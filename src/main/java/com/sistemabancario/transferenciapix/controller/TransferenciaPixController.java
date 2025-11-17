@@ -4,6 +4,7 @@ import com.sistemabancario.transferenciapix.dto.TransferenciaPixRequestDTO;
 import com.sistemabancario.transferenciapix.dto.TransferenciaPixResponseDTO;
 import com.sistemabancario.transferenciapix.entity.TransferenciaPix;
 import com.sistemabancario.transferenciapix.service.TransferenciaPixService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
@@ -43,7 +44,7 @@ public class TransferenciaPixController {
      * }
      */
     @PostMapping // Indica que é um endpoint HTTP POST
-    public TransferenciaPixResponseDTO enviar(@RequestBody TransferenciaPix transferencia) {
+    public TransferenciaPixResponseDTO enviar(@Valid @RequestBody TransferenciaPixRequestDTO transferencia) {
         // O JSON da requisição é convertido em um objeto TransferenciaPix automaticamente pelo Spring
         return service.enviar(transferencia);
     }
