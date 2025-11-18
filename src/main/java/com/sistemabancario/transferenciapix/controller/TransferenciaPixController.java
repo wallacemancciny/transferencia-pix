@@ -48,7 +48,6 @@ public class TransferenciaPixController {
         // O JSON da requisição é convertido em um objeto TransferenciaPix automaticamente pelo Spring
         return service.enviar(transferencia);
     }
-
     /**
      * Endpoint responsável por listar todas as transferências Pix cadastradas.
      * Método GET → retorna todos os registros.
