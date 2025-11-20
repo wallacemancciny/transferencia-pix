@@ -6,6 +6,7 @@ import com.sistemabancario.transferenciapix.dto.TransferenciaPixResponseDTO;
 import com.sistemabancario.transferenciapix.entity.TransferenciaPix;
 import com.sistemabancario.transferenciapix.service.TransferenciaPixService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
@@ -52,13 +53,7 @@ public class TransferenciaPixController {
 
         TransferenciaPixResponseDTO dto = service.enviar(transferencia);
 
-        OutputSuccessDTO response = new OutputSuccessDTO(
-                true,
-                dto,
-                Instant.now().toString()
-        );
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new OutputSuccessDTO(dto));
     }
     /**
      * Endpoint responsável por listar todas as transferências Pix cadastradas.
@@ -68,8 +63,12 @@ public class TransferenciaPixController {
      * GET /api/transferencias
      */
     @GetMapping
-    public List<TransferenciaPix> listar() {
-        return service.listar();
+    public ResponseEntity<OutputSuccessDTO<List<TransferenciaPixResponseDTO>>> listar() {
+
+        List<TransferenciaPixResponseDTO> dtoList = service.listar();
+
+        return ResponseEntity.ok(new OutputSuccessDTO(dtoList));
+
     }
 
     /**
@@ -80,14 +79,19 @@ public class TransferenciaPixController {
      * GET /api/transferencias/PIX-A1B2C3D4
      */
     @GetMapping("/{codigo}")
-    public TransferenciaPix buscarPorCodigo(@PathVariable String codigo) {
+    public ResponseEntity<OutputSuccessDTO> buscarPorCodigo(@PathVariable String codigo) {
         // @PathVariable = captura o valor da URL e passa pro método
-        return service.buscarPorCodigo(codigo);
+        TransferenciaPixResponseDTO dto = service.buscarPorCodigo(codigo);
+
+        return ResponseEntity.ok(new OutputSuccessDTO(dto));
     }
 
     @PutMapping("/{codigo}")
-    public TransferenciaPix cancelarPixPorCodigo(@PathVariable String codigo) {
-        return service.cancelarPixPorCodigo(codigo);
+    public ResponseEntity<OutputSuccessDTO> cancelarPixPorCodigo(@PathVariable String codigo) {
+
+        TransferenciaPixResponseDTO dto = service.cancelarPixPorCodigo(codigo);
+
+        return ResponseEntity.ok(new OutputSuccessDTO(dto));
     }
 
     @DeleteMapping("/{codigotransacao}")

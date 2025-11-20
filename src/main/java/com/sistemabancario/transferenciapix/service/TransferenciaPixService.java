@@ -10,7 +10,10 @@ import com.sistemabancario.transferenciapix.repository.TransferenciaPixRepositor
 // Importa as anotações e utilitários necessários
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,33 +74,45 @@ public class TransferenciaPixService {
      * Método para listar todas as transferências Pix do banco de dados.
      * Ideal para endpoints de consulta ou listagem geral.
      */
-    public List<TransferenciaPix> listar() {
+    public List<TransferenciaPixResponseDTO> listar() {
         // 🔸 Usa o método padrão do JpaRepository (findAll)
         // Internamente, executa: SELECT * FROM transferencia_pix
-        return repository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+        List<TransferenciaPix> transferenciaPixList = repository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+
+        return transferenciaPixList.stream()
+                .map(mapper::toResponseDTO)
+                .toList();
     }
 
     /**
      * Método para buscar uma transferência específica pelo código Pix.
      * É usado, por exemplo, quando o usuário quer rastrear um Pix pelo código do comprovante.
      */
-    public TransferenciaPix buscarPorCodigo(String codigo) {
+    public TransferenciaPixResponseDTO buscarPorCodigo(String codigo) {
         // 🔸 Chama o método personalizado do repository: findByCodigoTransacao
         // 🔸 Caso não encontre, lança uma exceção com a mensagem "Transferência não encontrada"
-        return repository.findByCodigoTransacao(codigo)
-                .orElseThrow(() -> new RuntimeException("Transferência não encontrada"));
+
+        TransferenciaPix transferenciaPix = repository.findByCodigoTransacao(codigo)
+                .orElseThrow(() -> new RuntimeException("Transferencia não encontrada"));
+
+        return mapper.toResponseDTO(transferenciaPix);
+
     }
 
-    public TransferenciaPix cancelarPixPorCodigo(String codigo) {
+    public TransferenciaPixResponseDTO cancelarPixPorCodigo(String codigo) {
         // Busca a transferência
         TransferenciaPix transferencia = repository.findByCodigoTransacao(codigo)
                 .orElseThrow(() -> new RuntimeException("Transferência não encontrada"));
 
         // Altera o status
         transferencia.setStatus("CANCELADO");
+        //Converte
 
         // Atualiza no banco de dados
-        return repository.save(transferencia);
+        TransferenciaPix saved = repository.save(transferencia);
+
+        return mapper.toResponseDTO(saved);
+
     }
 
     @Transactional
