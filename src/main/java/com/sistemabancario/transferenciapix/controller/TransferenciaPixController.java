@@ -64,7 +64,7 @@ public class TransferenciaPixController {
             return ok;
 
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new OutputSuccessDTO("Erro ao deletar transferência " + codigotransacao + " | " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new OutputSuccessDTO(false, "Erro ao deletar transferência " + codigotransacao + " | " + e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new OutputSuccessDTO("Erro inesperado ao deletar transferência " + codigotransacao + " | " + e.getMessage()));
         }
