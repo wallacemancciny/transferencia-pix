@@ -1,13 +1,54 @@
+version: "3.9"
+
 services:
-  postgres:
+  # -------------------------
+  # POSTGRES DO EMPRÉSTIMO
+  # -------------------------
+  postgres_emprestimo:
+    image: postgres:13
+    container_name: postgres_emprestimo_v2
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: emprestimo_db
+    ports:
+      - "5433:5432"       # Empréstimo na porta externa 5433
+    volumes:
+      - emprestimo_pgdata:/var/lib/postgresql/data
+
+  # -------------------------
+  # API EMPRÉSTIMO
+  # -------------------------
+  emprestimo_api:
+    image: emprestimo-api:latest   # sua imagem buildada
+    container_name: emprestimo_api_v2
+    depends_on:
+      - postgres_emprestimo
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_emprestimo:5432/emprestimo_db
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+    ports:
+      - "8081:8080"
+    restart: always
+
+  # -------------------------
+  # POSTGRES DO TRANSFERÊNCIA PIX
+  # -------------------------
+  postgres_transferencia_pix:
     image: postgres:16
-    container_name: postgres_transferencia_pix
+    container_name: postgres_transferencia_pix_v2
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: sistema_bancario
     ports:
-      - "5432:5432"
+      - "5432:5432"       # Transferência Pix usa 5432 externo
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - transferencia_pgdata:/var/lib/postgresql/data
+
+volumes:
+  emprestimo_pgdata:
+  transferencia_pgdata:
