@@ -17,11 +17,11 @@ public class UserDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private Long id;
+    private String id;
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
-    private String userId;
+    private User user;
     @Column(name = "email", nullable = false, unique = true)
     private String email;
     @Column(name = "telefone", nullable = false)
