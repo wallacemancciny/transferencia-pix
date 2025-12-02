@@ -36,7 +36,6 @@ public class DashboardController {
 
         String tokenClear = token.replace("{\"token\":\"", "").replace("\"}", "");
 
-
         Map response = webClient.get()
                 .uri("http://localhost:8081/emprestimos/")
                 .header("Authorization", "Bearer " + tokenClear)

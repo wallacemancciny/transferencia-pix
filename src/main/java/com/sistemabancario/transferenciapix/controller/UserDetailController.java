@@ -4,6 +4,7 @@ import com.sistemabancario.transferenciapix.dto.UserDetailRequestTempDTO;
 import com.sistemabancario.transferenciapix.dto.UserDetailResponseDTO;
 import com.sistemabancario.transferenciapix.service.UserDetailService;
 import org.mapstruct.Mapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +21,8 @@ public class UserDetailController {
     }
 
     @PostMapping
-    public UserDetailRequestTempDTO create(@RequestBody UserDetailRequestTempDTO dto) {
-        return userDetailService.create(dto);
+    public ResponseEntity<UserDetailRequestTempDTO> create(@RequestBody UserDetailRequestTempDTO dto) {
+        return ResponseEntity.ok(userDetailService.create(dto));
     }
 
 }
