@@ -1,10 +1,6 @@
 package com.sistemabancario.transferenciapix.service;
 
-import com.sistemabancario.transferenciapix.dto.EnderecoResponseDTO;
-import com.sistemabancario.transferenciapix.dto.UserDetailRequestDTO;
-import com.sistemabancario.transferenciapix.dto.UserDetailRequestTempDTO;
-import com.sistemabancario.transferenciapix.dto.UserDetailResponseDTO;
-import com.sistemabancario.transferenciapix.entity.User;
+import com.sistemabancario.transferenciapix.dto.*;
 import com.sistemabancario.transferenciapix.entity.UserDetail;
 import com.sistemabancario.transferenciapix.repository.UserDetailRepository;
 import com.sistemabancario.transferenciapix.repository.UserRepository;
@@ -12,6 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,6 +24,24 @@ public class UserDetailService {
         this.webClient = webClient;
         this.userRepository = userRepository;
         this.userDetailRepository = userDetailRepository;
+    }
+
+    public List<UserResponseDTO> getUserByCity(String city) {
+
+        List<UserDetail> userDetails = userDetailRepository.findByCidade(city);
+
+        return userDetails.stream()
+                .map(ud -> new UserResponseDTO(
+                        ud.getUser(),
+                        ud.getCep(),
+                        ud.getEmail(),
+                        ud.getTelefone(),
+                        ud.getEndereco(),
+                        ud.getCidade(),
+                        ud.getBairro(),
+                        ud.getNumeroResidencia(),
+                        ud.getTipo()
+                )).toList();
     }
 
     public UserDetailResponseDTO create(UserDetailRequestDTO dto) {
