@@ -1,11 +1,9 @@
 package com.sistemabancario.transferenciapix.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.context.annotation.Lazy;
 
 import java.util.UUID;
 
@@ -36,4 +34,8 @@ public class UserDetail {
     private Integer numeroResidencia;
     @Column(name = "tipo")
     private String tipo;
+    @Column(name = "cidade")
+    private String cidade;
+    @Column(name = "bairro")
+    private String bairro;
 }

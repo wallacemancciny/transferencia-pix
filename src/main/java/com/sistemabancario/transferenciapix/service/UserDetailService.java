@@ -1,41 +1,61 @@
 package com.sistemabancario.transferenciapix.service;
 
+import com.sistemabancario.transferenciapix.dto.EnderecoResponseDTO;
+import com.sistemabancario.transferenciapix.dto.UserDetailRequestDTO;
 import com.sistemabancario.transferenciapix.dto.UserDetailRequestTempDTO;
+import com.sistemabancario.transferenciapix.dto.UserDetailResponseDTO;
+import com.sistemabancario.transferenciapix.entity.User;
 import com.sistemabancario.transferenciapix.entity.UserDetail;
 import com.sistemabancario.transferenciapix.repository.UserDetailRepository;
 import com.sistemabancario.transferenciapix.repository.UserRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.Optional;
 
 @Service
 public class UserDetailService {
+
+    private final WebClient webClient;
 
     private final UserRepository userRepository;
     private final UserDetailRepository userDetailRepository;
 
 
-    public UserDetailService(UserRepository userRepository, UserDetailRepository userDetailRepository) {
+    public UserDetailService(WebClient webClient, UserRepository userRepository, UserDetailRepository userDetailRepository) {
+        this.webClient = webClient;
         this.userRepository = userRepository;
         this.userDetailRepository = userDetailRepository;
     }
 
-    public UserDetailRequestTempDTO create(UserDetailRequestTempDTO dto) {
+    public UserDetailResponseDTO create(UserDetailRequestDTO dto) {
 
         // verificar se já existe detalhe cadastrado
         var exists = userDetailRepository.findByUser_id(dto.userId());
         if (exists.isPresent()) {
-            throw new RuntimeException("Detalhe do usuário já cadastrado");
+            throw new UsernameNotFoundException("Detalhe do usuário já cadastrado");
         }
         //Verificar se usuário existe
         var user = userRepository.findById(dto.userId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+            .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+
+        //Conectar na api dos correios para buscar os dados de endereço
+        EnderecoResponseDTO getEndereco = webClient.get()
+                .uri("https://viacep.com.br/ws/{cep}/json/", dto.cep())
+                .retrieve()
+                .bodyToMono(EnderecoResponseDTO.class)
+                .block();
 
         //Montar entidade UserDetail
         var userDetail = new UserDetail();
         userDetail.setUser(user);
+        userDetail.setCep(getEndereco.cep());
         userDetail.setEmail(dto.email());
         userDetail.setTelefone(dto.telefone());
-        userDetail.setEndereco(dto.endereco());
-        userDetail.setCep(dto.cep());
+        userDetail.setEndereco(getEndereco.logradouro());
+        userDetail.setCidade(getEndereco.localidade());
+        userDetail.setBairro(getEndereco.bairro());
         userDetail.setNumeroResidencia(dto.numeroResidencia());
         userDetail.setTipo(dto.tipo());
 
@@ -43,12 +63,13 @@ public class UserDetailService {
         var savedUserDetail = userDetailRepository.save(userDetail);
 
         //Retornar DTO
-        return new UserDetailRequestTempDTO(
-                savedUserDetail.getUser().getId(),
+        return new UserDetailResponseDTO(
+                savedUserDetail.getCep(),
                 savedUserDetail.getEmail(),
                 savedUserDetail.getTelefone(),
                 savedUserDetail.getEndereco(),
-                savedUserDetail.getCep(),
+                savedUserDetail.getCidade(),
+                savedUserDetail.getBairro(),
                 savedUserDetail.getNumeroResidencia(),
                 savedUserDetail.getTipo()
         );

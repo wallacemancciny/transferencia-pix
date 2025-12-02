@@ -19,32 +19,18 @@ import java.util.Map;
 @RestControllerAdvice  // Marca esta classe como um "tratador global" de erros das Controllers
 public class GlobalExceptionHandler {
 
-    // Diz para o Spring: "Quando acontecer MethodArgumentNotValidException, chame este método"
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ResponseErroDTO> handleValidation(MethodArgumentNotValidException ex) {
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ResponseErroDTO> handleGeneric(Exception ex) {
 
-        // Estrutura que vai guardar os erros no formato campo → mensagem
-        Map<String, String> erros = new HashMap<>();
+        Map<String, String> detalhes = new HashMap<>();
+        detalhes.put("erro", ex.getMessage());
 
-        // Pega todos os erros de validação que aconteceram no DTO
-        // Para cada erro:
-        //   - error.getField() pega o nome do campo
-        //   - error.getDefaultMessage() pega a mensagem definida no @NotBlank, @Email etc
-        ex.getBindingResult().getFieldErrors()
-                .forEach(error -> erros.put(error.getField(), error.getDefaultMessage()));
-
-        // Monta o objeto final de resposta, seguindo seu padrão:
-        // erro = true
-        // msg = mensagem principal da API
-        // detalhes = mapa contendo campo → mensagem
         ResponseErroDTO response = new ResponseErroDTO(
                 true,
-                "Erro de validação nos campos enviados.",
-                erros
+                "Ocorreu um erro ao processar a requisição.",
+                detalhes
         );
 
-        // Retorna a resposta com status 400 (Bad Request)
-        // e o corpo contendo o objeto ResponseErroDTO já preenchido
         return ResponseEntity.badRequest().body(response);
     }
 }
